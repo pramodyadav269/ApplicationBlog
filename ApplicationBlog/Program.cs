@@ -43,6 +43,13 @@ builder.Services.AddDbContext<BlogDbContext>(item => item.UseSqlServer(builder.C
 
 var app = builder.Build();
 
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApplicationBlog v1");
+    c.RoutePrefix = string.Empty;
+});
+
+
 app.UseCors(x => x
             .AllowAnyMethod()
             .AllowAnyHeader()
