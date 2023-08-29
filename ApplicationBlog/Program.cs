@@ -27,12 +27,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add services to the container.
 
+builder.Services.AddCors();
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 //builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 //{
@@ -49,13 +52,21 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
-
+//For localhost to allow cross-origin request
 app.UseCors(x => x
             .AllowAnyMethod()
             .AllowAnyHeader()
             .SetIsOriginAllowed(origin => true) // allow any origin
-                                                //.WithOrigins("https://localhost:44351")); // Allow only this origin can also have multiple origins separated with comma
             .AllowCredentials()); // allow credentials
+
+//For PROD to allow request from specific application
+//app.UseCors(builder =>
+//{
+//    builder
+//           .WithOrigins(new string[] { "https://applicationblog-85678.web.app" })
+//           .AllowAnyMethod()
+//           .AllowAnyHeader();    
+//});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
