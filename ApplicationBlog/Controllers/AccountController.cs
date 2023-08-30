@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -129,46 +130,62 @@ namespace ApplicationBlog.Controllers
         public IActionResult Register(Register objRequest)
         {
             IActionResult response = null;
-            if (ModelState.IsValid)
+            try 
             {
-                Users objUsers = new Users()
+                if (ModelState.IsValid)
                 {
-                    Username = objRequest.Username,
-                    Password = HashPassword.GetHashPassword(objRequest.Password),
-                    Firstname = objRequest.Firstname,
-                    Lastname = objRequest.Lastname,
-                    Mobile = objRequest.Mobile,
-                    Gender = objRequest.Gender,
-                    DOB = DateTime.Parse(objRequest.DOB),
-                    ProfilePic = string.Empty,
-                    BackgroundPic = string.Empty,
-                    ProfileStatus = ValidationMessages.Register.ProfileDefaultStatus,
-                    CountryId = Convert.ToInt32(objRequest.CountryId),
-                    RegisteredOn = DateTime.Now,
-                    IsActive = true
-                };
-
-                var userAlreadyAvailable = _blogRepo.Register_AlreadyAvailable(objUsers);
-                if (userAlreadyAvailable == null)
-                {
-                    objUsers.Password = HashPassword.GetHashPassword(objRequest.Password);
-                    _blogRepo.Register(objUsers);                    
-
-                    string BasePath = _config["AppBasePath"].ToString();
-                    string RelativeFolderPath = "\\Files\\ProfilePic\\";
-                    string FilePath = (new CommonUtility()).SaveMediaFile(objUsers.UserId, objRequest.ProfilePic, BasePath, RelativeFolderPath);
-
-                    if (!string.IsNullOrEmpty(FilePath))
+                    Users objUsers = new Users()
                     {
-                        _blogRepo.Register_UpdateProfilePic(objUsers.UserId, FilePath);
+                        Username = objRequest.Username,
+                        Password = HashPassword.GetHashPassword(objRequest.Password),
+                        Firstname = objRequest.Firstname,
+                        Lastname = objRequest.Lastname,
+                        Mobile = objRequest.Mobile,
+                        Gender = objRequest.Gender,
+                        DOB = DateTime.Parse(objRequest.DOB),
+                        ProfilePic = string.Empty,
+                        BackgroundPic = string.Empty,
+                        ProfileStatus = ValidationMessages.Register.ProfileDefaultStatus,
+                        CountryId = Convert.ToInt32(objRequest.CountryId),
+                        RegisteredOn = DateTime.Now,
+                        IsActive = true
+                    };
+
+                    var userAlreadyAvailable = _blogRepo.Register_AlreadyAvailable(objUsers);
+                    if (userAlreadyAvailable == null)
+                    {
+                        objUsers.Password = HashPassword.GetHashPassword(objRequest.Password);
+                        _blogRepo.Register(objUsers);
+
+                        if (!string.IsNullOrEmpty(objRequest.ProfilePic))
+                        {
+                            string BasePath = _config["AppBasePath"].ToString();
+                            string RelativeFolderPath = "\\Files\\ProfilePic\\";
+                            
+                            string FilePath = (new CommonUtility()).SaveMediaFile(objUsers.UserId, objRequest.ProfilePic, BasePath, RelativeFolderPath);
+
+                            if (!string.IsNullOrEmpty(FilePath))
+                            {
+                                _blogRepo.Register_UpdateProfilePic(objUsers.UserId, FilePath);
+                            }
+                        }
+
+                        response = Ok(new RegisterResponse()
+                        {
+                            StatusCode = ValidationMessages.HttpRequestCode.SuccessCode,
+                            StatusMessage = ValidationMessages.HttpRequestCode.SuccessMsg,
+                            Description = ValidationMessages.Register.UserRegistered
+                        });
                     }
-
-                    response = Ok(new RegisterResponse()
+                    else
                     {
-                        StatusCode = ValidationMessages.HttpRequestCode.SuccessCode,
-                        StatusMessage = ValidationMessages.HttpRequestCode.SuccessMsg,
-                        Description = ValidationMessages.Register.UserRegistered
-                    });
+                        response = Ok(new RegisterResponse()
+                        {
+                            StatusCode = ValidationMessages.HttpRequestCode.ErrorCode,
+                            StatusMessage = ValidationMessages.HttpRequestCode.ErrorMsg,
+                            Description = ValidationMessages.Register.AlreadyRegistered
+                        });
+                    }
                 }
                 else
                 {
@@ -176,19 +193,26 @@ namespace ApplicationBlog.Controllers
                     {
                         StatusCode = ValidationMessages.HttpRequestCode.ErrorCode,
                         StatusMessage = ValidationMessages.HttpRequestCode.ErrorMsg,
-                        Description = ValidationMessages.Register.AlreadyRegistered
+                        Description = ValidationMessages.HttpRequestCode.AllMandatoryParameter
                     });
                 }
             }
-            else
+            catch (Exception ex) 
             {
-                response = Ok(new RegisterResponse()
+                ErrorLog objError = new ErrorLog()
                 {
-                    StatusCode = ValidationMessages.HttpRequestCode.ErrorCode,
-                    StatusMessage = ValidationMessages.HttpRequestCode.ErrorMsg,
-                    Description = ValidationMessages.HttpRequestCode.AllMandatoryParameter
-                });
-            }
+                    UserId = null,
+                    ControllerName = "Account",
+                    ActionName = "Register",
+                    RequestTime = DateTime.Now,
+                    JSONRequest = CommonUtility.ConvertObjectToJSON(objRequest),
+                    ErrorStackTrace = ex.Message + "--" + ex.StackTrace,
+                    ClientIP = CommonUtility.GetClientIPAddress()
+                };
+
+                _blogDB.tblErrorLog.Add(objError);
+                _blogDB.SaveChanges();
+            }            
             return response;
         }
 

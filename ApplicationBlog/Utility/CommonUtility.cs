@@ -1,6 +1,8 @@
 ﻿using ApplicationBlog.Model;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Data;
+using System.Net;
 
 namespace ApplicationBlog.Utility
 {
@@ -53,6 +55,26 @@ namespace ApplicationBlog.Utility
                 File.WriteAllBytes(BasePath + RelativeFolderPath + fileName, imageBytes);
             }
             return RelativeFilepath;
+        }
+        public static string ConvertObjectToJSON(Object objRequest)
+        {
+            return JsonConvert.SerializeObject(objRequest);
+        }
+        public static string GetClientIPAddress()
+        {
+            string IPAddress = string.Empty;
+            IPHostEntry Host = default(IPHostEntry);
+            string Hostname = null;
+            Hostname = System.Environment.MachineName;
+            Host = Dns.GetHostEntry(Hostname);
+            foreach (IPAddress IP in Host.AddressList)
+            {
+                if (IP.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    IPAddress = Convert.ToString(IP);
+                }
+            }
+            return IPAddress;
         }
     }
 }
