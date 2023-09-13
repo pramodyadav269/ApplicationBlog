@@ -159,9 +159,13 @@ namespace ApplicationBlog.Controllers
 
                         if (!string.IsNullOrEmpty(objRequest.ProfilePic))
                         {
-                            string BasePath = _config["AppBasePath"].ToString();
-                            string RelativeFolderPath = "\\Files\\ProfilePic\\";
-                            
+                            //Commented on 9 sep 2023
+                            //string BasePath = _config["AppBasePath"].ToString();
+                            //string RelativeFolderPath = "\\Files\\ProfilePic\\";
+
+                            string BasePath = Path.Combine("");
+                            string RelativeFolderPath = "\\Files\\ProfilePic\\";                           
+
                             string FilePath = (new CommonUtility()).SaveMediaFile(objUsers.UserId, objRequest.ProfilePic, BasePath, RelativeFolderPath);
 
                             if (!string.IsNullOrEmpty(FilePath))

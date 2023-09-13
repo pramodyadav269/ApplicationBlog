@@ -30,22 +30,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors();
 
+//CORS for all users
+//builder.Services.AddCors(policyBuilder => 
+//    policyBuilder.AddDefaultPolicy(policy => policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod())
+//);
+
+//CORS for specific users
+//builder.Services.AddCors(policyBuilder =>
+//    policyBuilder.AddDefaultPolicy(policy => policy.WithOrigins("https://applicationblog-85678.web.app").AllowAnyHeader().AllowAnyMethod())
+//);
+
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-//builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
-//{
-//    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-//}));
-
 builder.Services.AddDbContext<BlogDbContext>(item => item.UseSqlServer(builder.Configuration["ConnectionStrings:ApplicationBlog"]));
+
 
 var app = builder.Build();
 
+//This is to open default page when application is browsing with domain name only
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApplicationBlog v1");
