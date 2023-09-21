@@ -1,3 +1,4 @@
+using ApplicationBlog.Middlewares;
 using ApplicationBlog.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddTransient<CustomExceptionLogging>();
+// Provide a factory function to create an instance of CustomExceptionLogging with the required dependencies
+//builder.Services.AddTransient<CustomExceptionLogging>(serviceProvider =>
+//{
+//    var blogDbContext = serviceProvider.GetRequiredService<BlogDbContext>();
+//    return new CustomExceptionLogging(next => new CustomExceptionLogging(next, blogDbContext));
+//});
 
 builder.Services.AddCors();
 
@@ -47,7 +55,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BlogDbContext>(item => item.UseSqlServer(builder.Configuration["ConnectionStrings:ApplicationBlog"]));
-
 
 var app = builder.Build();
 
@@ -87,6 +94,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//app.UseMiddleware<CustomExceptionLogging>();
 app.MapControllers();
 
 app.Run();

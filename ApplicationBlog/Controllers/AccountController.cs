@@ -130,8 +130,8 @@ namespace ApplicationBlog.Controllers
         public IActionResult Register(Register objRequest)
         {
             IActionResult response = null;
-            try 
-            {
+            //try 
+            //{
                 if (ModelState.IsValid)
                 {
                     Users objUsers = new Users()
@@ -160,10 +160,10 @@ namespace ApplicationBlog.Controllers
                         if (!string.IsNullOrEmpty(objRequest.ProfilePic))
                         {
                             //Commented on 9 sep 2023
-                            //string BasePath = _config["AppBasePath"].ToString();
+                            string BasePath = _config["AppBasePath"].ToString();
                             //string RelativeFolderPath = "\\Files\\ProfilePic\\";
 
-                            string BasePath = Path.Combine("");
+                            //string BasePath = Path.Combine("");
                             string RelativeFolderPath = "\\Files\\ProfilePic\\";                           
 
                             string FilePath = (new CommonUtility()).SaveMediaFile(objUsers.UserId, objRequest.ProfilePic, BasePath, RelativeFolderPath);
@@ -173,6 +173,8 @@ namespace ApplicationBlog.Controllers
                                 _blogRepo.Register_UpdateProfilePic(objUsers.UserId, FilePath);
                             }
                         }
+
+                        string test = response.ToString();
 
                         response = Ok(new RegisterResponse()
                         {
@@ -200,23 +202,23 @@ namespace ApplicationBlog.Controllers
                         Description = ValidationMessages.HttpRequestCode.AllMandatoryParameter
                     });
                 }
-            }
-            catch (Exception ex) 
-            {
-                ErrorLog objError = new ErrorLog()
-                {
-                    UserId = null,
-                    ControllerName = "Account",
-                    ActionName = "Register",
-                    RequestTime = DateTime.Now,
-                    JSONRequest = CommonUtility.ConvertObjectToJSON(objRequest),
-                    ErrorStackTrace = ex.Message + "--" + ex.StackTrace,
-                    ClientIP = CommonUtility.GetClientIPAddress()
-                };
+            //}
+            //catch (Exception ex) 
+            //{
+            //    ErrorLog objError = new ErrorLog()
+            //    {
+            //        UserId = null,
+            //        ControllerName = "Account",
+            //        ActionName = "Register",
+            //        RequestTime = DateTime.Now,
+            //        JSONRequest = CommonUtility.ConvertObjectToJSON(objRequest),
+            //        ErrorStackTrace = ex.Message + "--" + ex.StackTrace,
+            //        ClientIP = CommonUtility.GetClientIPAddress()
+            //    };
 
-                _blogDB.tblErrorLog.Add(objError);
-                _blogDB.SaveChanges();
-            }            
+            //    _blogDB.tblErrorLog.Add(objError);
+            //    _blogDB.SaveChanges();
+            //}            
             return response;
         }
 
