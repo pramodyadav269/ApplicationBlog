@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddTransient<CustomExceptionLogging>();
+//builder.Services.AddTransient<CustomExceptionLogging>();
 // Provide a factory function to create an instance of CustomExceptionLogging with the required dependencies
 //builder.Services.AddTransient<CustomExceptionLogging>(serviceProvider =>
 //{
