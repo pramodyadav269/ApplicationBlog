@@ -94,7 +94,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseMiddleware<CustomExceptionLogging>();
+app.UseMiddleware<CustomExceptionLogging>();
 app.MapControllers();
 
 app.Run();

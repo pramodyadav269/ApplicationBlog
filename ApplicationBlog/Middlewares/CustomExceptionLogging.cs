@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System;
 using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace ApplicationBlog.Middlewares
 {
