@@ -327,6 +327,22 @@ namespace ApplicationBlog.Controllers
             return response;
         }
 
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetSampleResult")]
+        public IActionResult GetSampleResult()
+        {
+            IActionResult response = null;
+            response = Ok(new Response()
+            {
+                StatusCode = ValidationMessages.HttpRequestCode.SuccessCode,
+                StatusMessage = ValidationMessages.HttpRequestCode.SuccessMsg,
+                Description = ValidationMessages.HttpRequestCode.NoRecordFound
+            });
+            return response;
+        }
+
         //[NonAction]
         //private string GenerateToken(Users objUser)
         //{
