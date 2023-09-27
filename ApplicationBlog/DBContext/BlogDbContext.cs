@@ -17,6 +17,11 @@ namespace ApplicationBlog.Model
         public DbSet<City> tblCityMaster { get; set; }
         public DbSet<Country> tblCountryMaster { get; set; }
         public DbSet<FriendRequest> tblFriendRequest { get; set; }
+        public DbSet<Department> tblDepartment { get; set; }
+        public DbSet<Employee> tblEmployee { get; set; }
+        public DbSet<AppModule> tblAppModule { get; set; }
+        public DbSet<Project> tblProject { get; set; }
+        public DbSet<EmployeeProjectMapping> tblEmployeeProjectMapping { get; set; }
 
         public DbSet<ErrorLog> tblErrorLog { get; set; }
     }

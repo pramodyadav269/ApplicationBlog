@@ -4,6 +4,7 @@ using ApplicationBlog.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApplicationBlog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    partial class BlogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230927164735_Navigation_OneToMany_8")]
+    partial class Navigation_OneToMany_8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,29 +133,6 @@ namespace ApplicationBlog.Migrations
                     b.ToTable("tblEmployee");
                 });
 
-            modelBuilder.Entity("ApplicationBlog.Model.EmployeeProjectMapping", b =>
-                {
-                    b.Property<long>("MappingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MappingId"), 1L, 1);
-
-                    b.Property<long>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ProjectId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("MappingId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("tblEmployeeProjectMapping");
-                });
-
             modelBuilder.Entity("ApplicationBlog.Model.ErrorLog", b =>
                 {
                     b.Property<long>("ErrorId")
@@ -234,23 +213,6 @@ namespace ApplicationBlog.Migrations
                     b.HasKey("RequestId");
 
                     b.ToTable("tblFriendRequest");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.Project", b =>
-                {
-                    b.Property<long>("ProjectId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProjectId"), 1L, 1);
-
-                    b.Property<string>("ProjectName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProjectId");
-
-                    b.ToTable("tblProject");
                 });
 
             modelBuilder.Entity("ApplicationBlog.Model.State", b =>
@@ -476,25 +438,6 @@ namespace ApplicationBlog.Migrations
                     b.Navigation("ObjDepartment");
                 });
 
-            modelBuilder.Entity("ApplicationBlog.Model.EmployeeProjectMapping", b =>
-                {
-                    b.HasOne("ApplicationBlog.Model.Employee", "ObjEmployee")
-                        .WithMany("LstEmployeeProjectMapping")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApplicationBlog.Model.Project", "ObjProject")
-                        .WithMany("LstEmployeeProjectMapping")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ObjEmployee");
-
-                    b.Navigation("ObjProject");
-                });
-
             modelBuilder.Entity("ApplicationBlog.Model.Department", b =>
                 {
                     b.Navigation("ObjEmployee")
@@ -504,13 +447,6 @@ namespace ApplicationBlog.Migrations
             modelBuilder.Entity("ApplicationBlog.Model.Employee", b =>
                 {
                     b.Navigation("LstAppModule");
-
-                    b.Navigation("LstEmployeeProjectMapping");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.Project", b =>
-                {
-                    b.Navigation("LstEmployeeProjectMapping");
                 });
 #pragma warning restore 612, 618
         }

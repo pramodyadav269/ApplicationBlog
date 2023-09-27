@@ -4,6 +4,7 @@ using ApplicationBlog.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApplicationBlog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    partial class BlogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230927150935_Navigation_OneToMany_removed")]
+    partial class Navigation_OneToMany_removed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,28 +23,6 @@ namespace ApplicationBlog.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("ApplicationBlog.Model.AppModule", b =>
-                {
-                    b.Property<long>("AppModuleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AppModuleId"), 1L, 1);
-
-                    b.Property<string>("AppModuleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("AppModuleId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("tblAppModule");
-                });
 
             modelBuilder.Entity("ApplicationBlog.Model.City", b =>
                 {
@@ -99,7 +79,13 @@ namespace ApplicationBlog.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("DepartmentId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("tblDepartment");
                 });
@@ -112,9 +98,6 @@ namespace ApplicationBlog.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("EmployeeId"), 1L, 1);
 
-                    b.Property<long>("DepartmentId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -125,33 +108,7 @@ namespace ApplicationBlog.Migrations
 
                     b.HasKey("EmployeeId");
 
-                    b.HasIndex("DepartmentId")
-                        .IsUnique();
-
                     b.ToTable("tblEmployee");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.EmployeeProjectMapping", b =>
-                {
-                    b.Property<long>("MappingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MappingId"), 1L, 1);
-
-                    b.Property<long>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ProjectId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("MappingId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("tblEmployeeProjectMapping");
                 });
 
             modelBuilder.Entity("ApplicationBlog.Model.ErrorLog", b =>
@@ -234,23 +191,6 @@ namespace ApplicationBlog.Migrations
                     b.HasKey("RequestId");
 
                     b.ToTable("tblFriendRequest");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.Project", b =>
-                {
-                    b.Property<long>("ProjectId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProjectId"), 1L, 1);
-
-                    b.Property<string>("ProjectName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProjectId");
-
-                    b.ToTable("tblProject");
                 });
 
             modelBuilder.Entity("ApplicationBlog.Model.State", b =>
@@ -454,63 +394,21 @@ namespace ApplicationBlog.Migrations
                     b.ToTable("tblUsersMaster");
                 });
 
-            modelBuilder.Entity("ApplicationBlog.Model.AppModule", b =>
-                {
-                    b.HasOne("ApplicationBlog.Model.Employee", "ObjEmployee")
-                        .WithMany("LstAppModule")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ObjEmployee");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.Employee", b =>
-                {
-                    b.HasOne("ApplicationBlog.Model.Department", "ObjDepartment")
-                        .WithOne("ObjEmployee")
-                        .HasForeignKey("ApplicationBlog.Model.Employee", "DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ObjDepartment");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.EmployeeProjectMapping", b =>
-                {
-                    b.HasOne("ApplicationBlog.Model.Employee", "ObjEmployee")
-                        .WithMany("LstEmployeeProjectMapping")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApplicationBlog.Model.Project", "ObjProject")
-                        .WithMany("LstEmployeeProjectMapping")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ObjEmployee");
-
-                    b.Navigation("ObjProject");
-                });
-
             modelBuilder.Entity("ApplicationBlog.Model.Department", b =>
                 {
-                    b.Navigation("ObjEmployee")
+                    b.HasOne("ApplicationBlog.Model.Employee", "ObjEmployee")
+                        .WithOne("ObjDepartment")
+                        .HasForeignKey("ApplicationBlog.Model.Department", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ObjEmployee");
                 });
 
             modelBuilder.Entity("ApplicationBlog.Model.Employee", b =>
                 {
-                    b.Navigation("LstAppModule");
-
-                    b.Navigation("LstEmployeeProjectMapping");
-                });
-
-            modelBuilder.Entity("ApplicationBlog.Model.Project", b =>
-                {
-                    b.Navigation("LstEmployeeProjectMapping");
+                    b.Navigation("ObjDepartment")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
