@@ -9,11 +9,45 @@ namespace ApplicationBlog.DBContext
     {
         private IConfiguration _config;
         private readonly BlogDbContext _blogDB;
+
         public BlogRepository(IConfiguration config, BlogDbContext blogDB) 
         {
             _config = config;
             _blogDB = blogDB;
         }
+
+
+        public List<Employee> GetEmpDetails()//Example of Eager Loading,Lazy Loading & Explicit Loading
+        {
+            // Eager Loading
+            var employeesWithAppModules = _blogDB.tblEmployee.Include(e => e.LstAppModule).ToList();
+            foreach (var employee in employeesWithAppModules)
+            {
+                foreach (var module in employee.LstAppModule)
+                {
+                    var test = module.AppModuleName;
+                }
+            }
+
+            // Lazy Loading
+            var lazyLoadedEmployee = _blogDB.tblEmployee.First();
+            foreach (var module in lazyLoadedEmployee.LstAppModule)
+            {
+                var test = module.AppModuleName;
+            }
+             
+            // Explicit Loading
+            var explicitLoadedEmployee = _blogDB.tblEmployee.First();
+            _blogDB.Entry(explicitLoadedEmployee).Collection(e => e.LstAppModule).Load();            
+            foreach (var module in explicitLoadedEmployee.LstAppModule)
+            {
+                var test = module.AppModuleName;
+            }
+
+            return employeesWithAppModules;
+        }
+
+
         public Users Login(Login objRequest)
         {
             return _blogDB.tblUsersMaster.Where(

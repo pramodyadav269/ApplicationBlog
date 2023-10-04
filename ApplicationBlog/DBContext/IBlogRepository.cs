@@ -4,6 +4,8 @@ namespace ApplicationBlog.DBContext
 {
     public interface IBlogRepository
     {
+        List<Employee> GetEmpDetails();
+
         Users Login(Login objRequest);
         Users Register_AlreadyAvailable(Users objUsers);
         int Register(Users objUsers);
