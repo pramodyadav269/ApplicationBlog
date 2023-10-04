@@ -117,7 +117,7 @@ namespace ApplicationBlog.Controllers
             Users objUsers = GetClaims();
             if (objUsers != null)
             {
-                lstUserPost = _blogRepo.GetPersonalPost(id);
+                lstUserPost = _blogRepo.GetPersonalPost(objUsers.UserId);
 
                 if (lstUserPost != null && lstUserPost.Count > 0)
                 {
