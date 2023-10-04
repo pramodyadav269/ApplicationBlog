@@ -831,5 +831,56 @@ esc
  */
 
 
+/*
+create table tblLeadSourceMapping(Id bigint identity(1,1) not null,TokenSource varchar(50),LeadSource varchar(50),FilterKey varchar(50))
+insert into tblLeadSourceMapping values('OneCRM','HomePage')
+insert into tblLeadSourceMapping values('OneCRM','Microsite')
+insert into tblLeadSourceMapping values('OneCRM','ABC')
 
+create table tblCampaignMapping(Id bigint identity(1,1),LSMap bigint,Parameter varchar(50),Value varchar(50),ParentId bigint,CampaignId varchar(50))
+insert into tblCampaignMapping values(1,'BusinessName','LifeInsurance',null,'1001')
+insert into tblCampaignMapping values(2,'BusinessName','LifeInsurance',null,'1002')
+insert into tblCampaignMapping values(2,'UTM','UTMSet1',null,'1003')
+insert into tblCampaignMapping values(2,'UTM','UTMSet2',null,'1004')
+insert into tblCampaignMapping values(2,'BusinessName','MutualFunds',3,null)
+insert into tblCampaignMapping values(2,'BusinessName','MutualFunds',4,null)
+insert into tblCampaignMapping values(3,'Pincode','PincodeSet1',null,'1005')
+insert into tblCampaignMapping values(3,'Pincode','PincodeSet1',null,'1006')
+insert into tblCampaignMapping values(3,'ProductCode','ProductCode1',7,null)
+insert into tblCampaignMapping values(3,'ProductCode','ProductCode2',8,null)
+
+select * from tblLeadSourceMapping
+select * from tblCampaignMapping
+
+declare @BusinessName varchar(50)='MutualFunds'--hard coded
+declare @id bigint,@FilterKey varchar(50),
+@ChildId bigint=0,@CampaignId varchar(50), @JsonValue varchar(50)
+select @id = id, @FilterKey=FilterKey from tblLeadSourceMapping where LeadSource = 'Microsite' and TokenSource='OneCRM'
+
+if(@FilterKey is not null)
+Begin
+		SET @JsonValue = @BusinessName -- Read it from JSON on basis of @FilterKey
+		create table #tmp(ChildId bigint)
+
+		while(@ChildId is not null)
+		begin
+				insert into #tmp
+				select ChildId from tblCampaignMapping where LSMap=@id and Parameter=@FilterKey and Value = @JsonValue 
+
+				if((select count(ChildId) from #tmp where ChildId is not null) > 0)
+				Begin
+						select @FilterKey = Parameter from tblCampaignMapping where Id in(select ChildId from #tmp)
+						SET @JsonValue = 'UTMSet1' -- Read it from JSON on basis of @FilterKey							
+				End	
+				else
+				Begin
+						select @CampaignId = CampaignId from tblCampaignMapping where LSMap=@id and Parameter=@FilterKey and Value = @JsonValue 
+						break;
+				End
+		end
+End
+drop table #tmp
+select @CampaignId as CampaignId
+
+ */
 
