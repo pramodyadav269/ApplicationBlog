@@ -87,6 +87,8 @@ namespace ApplicationBlog.Controllers
             IActionResult response = Unauthorized();
             if (ModelState.IsValid)
             {
+                //_blogRepo.GetEmpDetails();//Example of Eager Loading,Lazy Loading & Explicit Loading
+
                 objRequest.Password = HashPassword.GetHashPassword(objRequest.Password);
                 var _user = _blogRepo.Login(objRequest);
 
