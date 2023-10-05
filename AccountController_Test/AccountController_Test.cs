@@ -849,6 +849,12 @@ insert into tblCampaignMapping values(3,'Pincode','PincodeSet1',null,'1006')
 insert into tblCampaignMapping values(3,'ProductCode','ProductCode1',7,null)
 insert into tblCampaignMapping values(3,'ProductCode','ProductCode2',8,null)
 
+update tblCampaignMapping set Value='PincodeSet2' where Id=8
+insert into tblCampaignMapping values(3,'ProductCode','ProductCode1',8,null)
+insert into tblCampaignMapping values(3,'BusinessName','MutualFunds',9,null)
+insert into tblCampaignMapping values(3,'BusinessName','MutualFunds',11,null)
+insert into tblCampaignMapping values(3,'BusinessName','MutualFunds',10,null)
+
 select * from tblLeadSourceMapping
 select * from tblCampaignMapping
 
