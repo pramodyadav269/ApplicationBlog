@@ -852,35 +852,51 @@ insert into tblCampaignMapping values(3,'ProductCode','ProductCode2',8,null)
 select * from tblLeadSourceMapping
 select * from tblCampaignMapping
 
-declare @BusinessName varchar(50)='MutualFunds'--hard coded
-declare @id bigint,@FilterKey varchar(50),
-@ChildId bigint=0,@CampaignId varchar(50), @JsonValue varchar(50)
-select @id = id, @FilterKey=FilterKey from tblLeadSourceMapping where LeadSource = 'Microsite' and TokenSource='OneCRM'
+declare @LeadSource varchar(50)='ABC',@TokenSource varchar(50)='OneCRM'
+,@json_data NVARCHAR(MAX)= '{"BusinessName": "MutualFunds", "UTM": "UTMSet1", "ProductCode": "ProductCode2", "Pincode": "PincodeSet2"}'
+
+declare @id bigint,@FilterKey varchar(50),@JsonKeyValue varchar(50),@ChildId bigint=0,@CampaignId varchar(50)
+select @id = id, @FilterKey=FilterKey from tblLeadSourceMapping where LeadSource = @LeadSource and TokenSource=@TokenSource
 
 if(@FilterKey is not null)
 Begin
-		SET @JsonValue = @BusinessName -- Read it from JSON on basis of @FilterKey
-		create table #tmp(ChildId bigint)
+		SELECT @JsonKeyValue = value FROM OPENJSON(@json_data) WHERE [key] = @FilterKey
+		create table #tmp(Id bigint)
+		create table #tmp2(Id bigint)
+		insert into #tmp
+		select Id from tblCampaignMapping where LSMap=@id and Parameter=@FilterKey and Value = @JsonKeyValue 
 
-		while(@ChildId is not null)
+		while(@id is not null)
 		begin
-				insert into #tmp
-				select ChildId from tblCampaignMapping where LSMap=@id and Parameter=@FilterKey and Value = @JsonValue 
-
-				if((select count(ChildId) from #tmp where ChildId is not null) > 0)
+				if((select count(Id) from #tmp) <= 0)
 				Begin
-						select @FilterKey = Parameter from tblCampaignMapping where Id in(select ChildId from #tmp)
-						SET @JsonValue = 'UTMSet1' -- Read it from JSON on basis of @FilterKey							
+					break;
+				End
+				else if((select count(Id) from tblCampaignMapping where Id in(select Id from #tmp) and CampaignId is not null) > 0)
+				Begin
+						select @CampaignId = CampaignId from tblCampaignMapping 
+						where Id in(select Id from #tmp) and Parameter=@FilterKey and Value = @JsonKeyValue and CampaignId is not null
+						break;	
 				End	
 				else
-				Begin
-						select @CampaignId = CampaignId from tblCampaignMapping where LSMap=@id and Parameter=@FilterKey and Value = @JsonValue 
-						break;
-				End
+				Begin	
+						insert into #tmp2 select Id from #tmp
+						truncate table #tmp
+						insert into #tmp
+						select ChildId from tblCampaignMapping where Id in(select Id from #tmp2) and Parameter=@FilterKey and Value = @JsonKeyValue
+						truncate table #tmp2
+
+						select @FilterKey = Parameter from tblCampaignMapping where Id in(select Id from #tmp)						
+						SELECT @JsonKeyValue = value FROM OPENJSON(@json_data) WHERE [key] = @FilterKey		
+						select @FilterKey,@JsonKeyValue
+						select * from #tmp						
+				End				
 		end
 End
 drop table #tmp
+drop table #tmp2
 select @CampaignId as CampaignId
+
 
  */
 
